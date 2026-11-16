@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROJECT JARVIS 4.0</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 25px 15px;
+  background: #05090e;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.app {
+  max-width: 480px;
+  margin: auto;
+}
+
+h1 {
+  color: #00d9ff;
+  letter-spacing: 6px;
+  margin-top: 25px;
+}
+
+.status {
+  color: #00ffae;
+  letter-spacing: 3px;
+}
+
+.reactor {
+  width: 170px;
+  height: 170px;
+  border: 3px solid #00d9ff;
+  border-radius: 50%;
+  margin: 35px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px #00bfff;
+  animation: pulse 2s infinite alternate;
+}
+
+.core {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  background: #00cfff;
+  box-shadow: 0 0 35px #00dfff;
+}
+
+@keyframes pulse {
+  to {
+    transform: scale(1.08);
+  }
+}
+
+.panel {
+  background: #101923;
+  border: 1px solid #087eaa;
+  border-radius: 15px;
+  padding: 18px;
+  margin-top: 20px;
+}
+
+#reply {
+  color: #75eaff;
+  min-height: 45px;
+  line-height: 1.6;
+}
+
+#heard {
+  color: #00ffae;
+  min-height: 25px;
+}
+
+select, input {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  background: #08131d;
+  color: white;
+  border: 1px solid #087eaa;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+button {
+  background: #087eaa;
+  color: white;
+  padding: 14px 18px;
+  margin: 8px 3px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.mic {
+  background: #008f68;
+}
+
+.stop {
+  background: #a52a2a;
+}
+
+.footer {
+  margin-top: 30px;
+  color: #52798b;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<h1>J.A.R.V.I.S</h1>
+
+<p class="status">● SYSTEM ONLINE</p>
+
+<div class="reactor">
+  <div class="core"></div>
+</div>
+
+<h3>Welcome Back, Sir.</h3>
+
+<p>Your personal assistant is ready.</p>
+
+<div class="panel">
+
+<p>JARVIS RESPONSE</p>
+
+<p id="reply">
+All systems operational. Awaiting your command, Sir.
+</p>
+
+<hr>
+
+<small>VOICE RECOGNITION</small>
+
+<p id="heard">Waiting for your voice...</p>
+
+</div>
+
+<select id="language">
+  <option value="en-IN">English (India)</option>
+  <option value="ta-IN">Tamil (India)</option>
+</select>
+
+<input
+  id="command"
+  type="text"
+  placeholder="Type your command here..."
+>
+
+<button onclick="sendCommand()">SEND</button>
+
+<button class="mic" onclick="listen()">
+🎙 START LISTENING
+</button>
+
+<button class="stop" onclick="stopListening()">
+STOP
+</button>
+
+<div class="footer">
+PROJECT JARVIS · VERSION 4.0
+</div>
+
+</div>
+
+<script>
+
+const input = document.getElementById("command");
+const reply = document.getElementById("reply");
+const heard = document.getElementById("heard");
+const language = document.getElementById("language");
+
+let recognition = null;
+
+function speak(message) {
+
+  reply.innerText = message;
+
+  if (!("speechSynthesis" in window)) {
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const speech = new SpeechSynthesisUtterance(message);
+
+  speech.lang = language.value;
+  speech.rate = 0.9;
+  speech.pitch = 0.85;
+  speech.volume = 1;
+
+  window.speechSynthesis.speak(speech);
+}
+
+function sendCommand() {
+
+  const cmd = input.value.toLowerCase().trim();
+
+  const tamil = language.value === "ta-IN";
+
+  if (!cmd) {
+    speak("Please give me a command, Sir.");
+    return;
+  }
+
+  if (
+    cmd.includes("hello") ||
+    cmd.includes("hi jarvis") ||
+    cmd.includes("வணக்கம்")
+  ) {
+
+    speak(tamil
+      ? "வணக்கம் சார். நான் உங்கள் ஜார்விஸ். எப்படி உதவ வேண்டும்?"
+      : "Hello Sir. JARVIS is at your service.");
+
+  }
+
+  else if (
+    cmd.includes("time") ||
+    cmd.includes("நேரம்")
+  ) {
+
+    const time = new Date().toLocaleTimeString(
+      tamil ? "ta-IN" : "en-IN"
+    );
+
+    speak(tamil
+      ? "இப்போதைய நேரம் " + time
+      : "The current time is " + time);
+
+  }
+
+  else if (
+    cmd.includes("date") ||
+    cmd.includes("தேதி")
+  ) {
+
+    const date = new Date().toLocaleDateString(
+      tamil ? "ta-IN" : "en-IN"
+    );
+
+    speak(tamil
+      ? "இன்றைய தேதி " + date
+      : "Today's date is " + date);
+
+  }
+
+  else if (
+    cmd.includes("your name") ||
+    cmd.includes("உன் பெயர்")
+  ) {
+
+    speak(tamil
+      ? "என் பெயர் ஜார்விஸ்."
+      : "My name is JARVIS, your personal assistant.");
+
+  }
+
+  else if (
+    cmd.includes("who am i") ||
+    cmd.includes("நான் யார்")
+  ) {
+
+    speak(tamil
+      ? "நீங்கள் என் உருவாக்கியவர் சார்."
+      : "You are my creator, Sir.");
+
+  }
+
+  else if (
+    cmd.includes("how are you") ||
+    cmd.includes("எப்படி இருக்க")
+  ) {
+
+    speak(tamil
+      ? "நான் நன்றாக இருக்கிறேன் சார்."
+      : "All systems are operational, Sir.");
+
+  }
+
+  else if (
+    cmd.includes("help") ||
+    cmd.includes("உதவி")
+  ) {
+
+    speak(tamil
+      ? "நேரம், தேதி, பெயர் மற்றும் வணக்கம் என்று கேட்கலாம்."
+      : "You can ask me the time, date, my name, or say hello.");
+
+  }
+
+  else if (
+    cmd.includes("stop")
+  ) {
+
+    window.speechSynthesis.cancel();
+
+    reply.innerText = "Voice stopped, Sir.";
+
+  }
+
+  else {
+
+    speak(tamil
+      ? "உங்கள் கட்டளையைப் பெற்றேன் சார். உண்மையான AI இணைப்பு இன்னும் தேவை."
+      : "Command received, Sir. My advanced AI brain is not connected yet.");
+
+  }
+
+  input.value = "";
+
+}
+
+function listen() {
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+
+    speak("Voice recognition is not supported. Please use Google Chrome.");
+
+    return;
+  }
+
+  if (recognition) {
+    recognition.abort();
+  }
+
+  recognition = new SpeechRecognition();
+
+  recognition.lang = language.value;
+  recognition.interimResults = false;
+  recognition.continuous = false;
+  recognition.maxAlternatives = 1;
+
+  heard.innerText = "Listening, Sir...";
+
+  recognition.onresult = function(event) {
+
+    const transcript =
+      event.results[0][0].transcript;
+
+    input.value = transcript;
+
+    heard.innerText = "You said: " + transcript;
+
+    sendCommand();
+
+  };
+
+  recognition.onerror = function(event) {
+
+    heard.innerText =
+      "Microphone error: " + event.error;
+
+  };
+
+  recognition.onend = function() {
+
+    if (heard.innerText === "Listening, Sir...") {
+      heard.innerText = "Listening stopped.";
+    }
+
+  };
+
+  try {
+
+    recognition.start();
+
+  } catch (error) {
+
+    heard.innerText = "Please try again.";
+
+  }
+
+}
+
+function stopListening() {
+
+  if (recognition) {
+    recognition.abort();
+  }
+
+  window.speechSynthesis.cancel();
+
+  heard.innerText = "Voice system stopped.";
+
+  reply.innerText = "System standing by, Sir.";
+
+}
+
+input.addEventListener("keydown", function(event) {
+
+  if (event.key === "Enter") {
+    sendCommand();
+  }
+
+});
+
+</script>
+
+</body>
+</html>
